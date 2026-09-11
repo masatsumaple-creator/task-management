@@ -13,7 +13,12 @@
       "id": "string (一意なID)",
       "title": "string",
       "cards": [
-        { "id": "string (一意なID)", "title": "string" }
+        {
+          "id": "string (一意なID)",
+          "title": "string",
+          "priority": "high | medium | low",
+          "dueDate": "string (YYYY-MM-DD、未設定は空文字)"
+        }
       ]
     }
   ]
@@ -21,6 +26,8 @@
 ```
 
 リスト・カードの並び順は配列の並び順そのものが表す。IDは追加時に生成し、削除・移動時にも変更しない。ボードは1つのみで、ボード自体をIDで管理する概念は持たない。
+
+`priority` はカードの優先度を3段階（`high` / `medium` / `low`）で表し、カード作成時は既定値として `medium` を設定する。`dueDate` はカードの期限日で、未入力の場合は空文字を保持する。期限日が本日より過去の場合、画面上は期限超過として強調表示する。
 
 ## DB移行を見据えたER図（将来構成）
 
@@ -49,6 +56,8 @@ erDiagram
     string id PK
     string list_id FK
     string title
+    string priority "high, medium, low"
+    date due_date "null許容"
     int position
     datetime created_at
     datetime updated_at
