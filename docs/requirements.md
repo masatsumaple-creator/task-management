@@ -1,7 +1,7 @@
 # タスクボード要件定義書
 
 - 作成日: 2026-09-10
-- バージョン: 0.6
+- バージョン: 0.7
 - 実装方式: HTML / CSS / JavaScript（サーバーレス）
 - 状態: MVP実装済み
 
@@ -110,6 +110,7 @@ flowchart LR
 | [画面構成](requirements/screens.md) | ワイヤーフレーム、操作フロー図 |
 | [データモデル](requirements/data-model.md) | 現行の `localStorage` / JSONモデル、DB移行を見据えたER図 |
 | [制約・前提条件 / 今後の拡張候補](requirements/roadmap.md) | データ保存範囲の制約、優先度付き拡張候補一覧 |
+| [技術スタック](requirements/tech-stack.md) | バックエンド導入時に採用する技術スタック（Java/Spring Boot、React、PostgreSQL） |
 | [改訂履歴](requirements/changelog.md) | バージョンごとの変更内容（全件） |
 
 ---
