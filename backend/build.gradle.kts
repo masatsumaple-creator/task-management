@@ -21,9 +21,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
+	// 通常起動時はPostgreSQLを使用する（docker-compose.ymlで起動）
+	runtimeOnly("org.postgresql:postgresql")
+	// H2は "h2" プロファイル起動時のみ使用する（DockerなしでのAPI疎通確認用）
 	runtimeOnly("com.h2database:h2")
-	// PostgreSQLへ移行する際は下記のコメントを解除する
-	// runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

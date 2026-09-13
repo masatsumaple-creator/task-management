@@ -10,6 +10,8 @@
 
 ## 起動方法
 
+事前にPostgreSQLコンテナを起動しておく（[データベース](#データベース)を参照）。
+
 ```bash
 # Linux / macOS / Git Bash
 ./gradlew bootRun
@@ -35,18 +37,30 @@ curl http://localhost:8080/api/hello
 
 ## データベース
 
-デフォルトではH2インメモリDBを使用する（アプリ終了時にデータは消える）。
+デフォルトではPostgreSQLを使用する。事前にDockerコンテナを起動しておくこと（詳細は[ルートのREADME/docker-compose.yml](../docker-compose.yml)を参照）。
+
+```bash
+# リポジトリルートで実行
+docker compose up -d db
+```
+
+- 接続先: `jdbc:postgresql://localhost:5432/taskboard`（`docker-compose.yml` と対応）
+- ユーザー名 / パスワードは `.env`（`.env.example` をコピーして作成）で設定する
+- 接続情報は環境変数 `SPRING_DATASOURCE_URL` / `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` でも上書き可能（[application.properties](src/main/resources/application.properties)）
+
+Dockerを使わずに素早く疎通確認したい場合は、`h2` プロファイルでインメモリDB起動もできる（アプリ終了時にデータは消える）。
+
+```bash
+./gradlew bootRun --args='--spring.profiles.active=h2'
+```
 
 - H2コンソール: `http://localhost:8080/h2-console`
 - JDBC URL: `jdbc:h2:mem:taskboard`
 - ユーザー名: `sa` / パスワード: なし
 
-将来PostgreSQLへ切り替える際は、[application.properties](src/main/resources/application.properties) 内のH2設定をコメントアウトし、コメントアウトされているPostgreSQL用設定を有効化する。あわせて [build.gradle.kts](build.gradle.kts) の `org.postgresql:postgresql` 依存関係のコメントも解除する。
-
 ## 今後の予定
 
 - Board / List / Card のJPAエンティティ・リポジトリの実装
 - 各エンティティに対するREST API（Controller / Service層）の実装
-- PostgreSQLへの切り替え
 
 詳細は[要件定義書](../docs/requirements.md)・[データモデル](../docs/requirements/data-model.md)を参照。
