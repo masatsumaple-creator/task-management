@@ -1,0 +1,11 @@
+.claude/settings.local.json
+.env
+
+# Dev server run artifacts (PID files, redirected logs) created when starting
+# backend/frontend locally per .claude/skills/dev-server-startup/SKILL.md
+backend/backend-run.log
+backend/backend-run.err.log
+backend/backend-pid.txt
+frontend/frontend-dev.log
+frontend/frontend-dev.err.log
+frontend/frontend-pid.txt

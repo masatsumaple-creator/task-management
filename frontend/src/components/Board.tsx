@@ -1,0 +1,48 @@
+import type { Card } from "../types/card";
+import Column, { type ColumnData } from "./Column";
+
+interface Props {
+  cards: Card[];
+  loading: boolean;
+  error: string | null;
+}
+
+/**
+ * 検索結果のカード配列を listId でグルーピングして列（リスト）に組み立てる。
+ *
+ * 既知の制約: /api/lists のようなリスト一覧取得APIが存在しないため、
+ * 検索条件に一致するカードが1件もないリストは列自体が表示されない。
+ */
+function groupByList(cards: Card[]): ColumnData[] {
+  const map = new Map<number, ColumnData>();
+  for (const card of cards) {
+    if (!map.has(card.listId)) {
+      map.set(card.listId, { listId: card.listId, listTitle: card.listTitle, cards: [] });
+    }
+    map.get(card.listId)!.cards.push(card);
+  }
+  return [...map.values()].sort((a, b) => a.listId - b.listId);
+}
+
+export default function Board({ cards, loading, error }: Props) {
+  if (loading) {
+    return <p className="board-status">読み込み中...</p>;
+  }
+  if (error) {
+    return <p className="board-status board-status--error">エラー: {error}</p>;
+  }
+
+  const columns = groupByList(cards);
+
+  if (columns.length === 0) {
+    return <p className="board-status">該当するカードがありません。</p>;
+  }
+
+  return (
+    <div className="board">
+      {columns.map((column) => (
+        <Column key={column.listId} column={column} />
+      ))}
+    </div>
+  );
+}
