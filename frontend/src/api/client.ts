@@ -21,3 +21,20 @@ export async function apiGet<T>(
   }
   return response.json() as Promise<T>;
 }
+
+/**
+ * バックエンドAPIへの POST リクエストを行う共通関数。
+ * body は JSON としてシリアライズして送信する。
+ */
+export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  const url = new URL(path, BASE_URL);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  return response.json() as Promise<T>;
+}
