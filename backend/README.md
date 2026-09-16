@@ -2,7 +2,20 @@
 
 タスクボードアプリのバックエンド。[技術スタック](../docs/requirements/tech-stack.md)に基づき、Java / Spring Boot / Gradle / Spring Data JPA で構成する。
 
-現時点では起動確認用の最小構成のみで、Board / List / Card のAPIは未実装。
+Board / List / Card のJPAエンティティ・リポジトリと、Card / List に対するREST APIを実装済み。
+
+## API
+
+| メソッド | パス | 内容 |
+| --- | --- | --- |
+| GET | `/api/lists` | リスト一覧取得（position順） |
+| GET | `/api/cards` | カード検索（`keyword` / `priority` / `listId` で絞り込み） |
+| GET | `/api/cards/{id}` | カード単体取得 |
+| POST | `/api/cards` | カード新規登録 |
+| PUT | `/api/cards/{id}` | カード更新（タイトル・優先度・期日） |
+| PATCH | `/api/cards/{id}/position` | カードのドラッグ&ドロップ移動（リスト間移動を含む） |
+| PUT | `/api/cards/reorder` | リスト内カードの一括並べ替え |
+| DELETE | `/api/cards/{id}` | カード削除（物理削除） |
 
 ## 前提
 
@@ -60,7 +73,7 @@ Dockerを使わずに素早く疎通確認したい場合は、`h2` プロファ
 
 ## 今後の予定
 
-- Board / List / Card のJPAエンティティ・リポジトリの実装
-- 各エンティティに対するREST API（Controller / Service層）の実装
+- Board（ボード）に対するREST APIの実装（現状は単一ボード運用のため未着手）
+- カード作成・更新時のバリデーションエラーをフォーマットする共通例外ハンドラ（`@ControllerAdvice`）の導入
 
 詳細は[要件定義書](../docs/requirements.md)・[データモデル](../docs/requirements/data-model.md)を参照。

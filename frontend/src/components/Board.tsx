@@ -18,8 +18,9 @@ export interface DropTarget {
 /**
  * 検索結果のカード配列を listId でグルーピングして列（リスト）に組み立てる。
  *
- * 既知の制約: /api/lists のようなリスト一覧取得APIが存在しないため、
- * 検索条件に一致するカードが1件もないリストは列自体が表示されない。
+ * 既知の制約: このグルーピングは検索結果の `cards` のみから列を組み立てるため、
+ * 検索条件に一致するカードが1件もないリストは列自体が表示されない
+ * （`GET /api/lists` 自体は存在するが、ここでは利用していない）。
  */
 function groupByList(cards: Card[]): ColumnData[] {
   const map = new Map<number, ColumnData>();

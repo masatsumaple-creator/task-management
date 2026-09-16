@@ -52,19 +52,21 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
-    searchCards(filters)
-      .then((result) => {
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await searchCards(filters);
         if (!cancelled) setCards(result);
-      })
-      .catch((err: unknown) => {
+      } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : String(err));
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    }
+
+    load();
 
     return () => {
       cancelled = true;

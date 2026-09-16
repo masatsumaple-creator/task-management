@@ -7,7 +7,7 @@ Trello風の「リスト × カード」形式で、個人のタスクを素早�
 | 実装 | 状態 | 内容 |
 | --- | --- | --- |
 | MVP（静的サイト） | 実装済み・単体で動作可能 | ルート直下の `index.html` / `style.css` / `app.js`。サーバー不要、`localStorage` にデータを保存するサーバーレス構成。 |
-| バックエンド移行版 | 実装中 | `backend/`（Spring Boot API）と `frontend/`（React + Vite SPA）。マルチデバイス同期を見据えたサーバー・DB構成。現時点ではカード検索表示のみ対応。 |
+| バックエンド移行版 | 実装中 | `backend/`（Spring Boot API）と `frontend/`（React + Vite SPA）。マルチデバイス同期を見据えたサーバー・DB構成。リスト一覧取得、カードの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。 |
 
 どちらを触るかによってセットアップ方法が異なるため、以下を参照。
 
@@ -21,7 +21,7 @@ Trello風の「リスト × カード」形式で、個人のタスクを素早�
 
 ## 2. バックエンド移行版（Spring Boot + React）
 
-[技術スタック](docs/requirements/tech-stack.md)に基づき、Java / Spring Boot / PostgreSQL のAPIと、React + Vite のSPAで構成する。現時点ではカード検索・ボード表示のみで、作成・編集・削除やドラッグ&ドロップは未実装。
+[技術スタック](docs/requirements/tech-stack.md)に基づき、Java / Spring Boot / PostgreSQL のAPIと、React + Vite のSPAで構成する。リスト一覧取得、カードの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。
 
 ### 構成
 
