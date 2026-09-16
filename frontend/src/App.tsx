@@ -93,6 +93,7 @@ export default function App() {
           card={selectedCard}
           onClose={() => setSelectedCard(null)}
           onUpdated={() => setRefreshKey((key) => key + 1)}
+          onDeleted={() => setRefreshKey((key) => key + 1)}
         />
       )}
     </div>

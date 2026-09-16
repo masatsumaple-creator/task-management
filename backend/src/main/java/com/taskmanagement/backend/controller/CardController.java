@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +37,7 @@ import jakarta.validation.Valid;
 
 /**
  * カード（タスク）のAPI。
- * 一覧取得・検索・単体取得・登録・更新・移動を提供する。削除は未実装。
+ * 一覧取得・検索・単体取得・登録・更新・移動・削除（物理削除）を提供する。
  */
 @RestController
 public class CardController {
@@ -117,6 +118,27 @@ public class CardController {
 		Card saved = cardRepository.save(card);
 
 		return ResponseEntity.ok(CardResponse.from(saved));
+	}
+
+	/**
+	 * カードを物理削除する。削除後、同一リスト内の残りのカードの position を詰め直す。
+	 * 対象カードが存在しない場合は404を返す。
+	 */
+	@DeleteMapping("/api/cards/{id}")
+	@Transactional
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		Card card = cardRepository.findById(id).orElse(null);
+		if (card == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		TaskList list = card.getList();
+		cardRepository.delete(card);
+
+		List<Card> siblings = cardRepository.findByListOrderByPositionAsc(list);
+		reindex(siblings);
+
+		return ResponseEntity.noContent().build();
 	}
 
 	/**

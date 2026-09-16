@@ -46,6 +46,17 @@ export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
   return apiSend<T>("PATCH", path, body);
 }
 
+/**
+ * バックエンドAPIへの DELETE リクエストを行う共通関数。
+ */
+export async function apiDelete(path: string): Promise<void> {
+  const url = new URL(path, BASE_URL);
+  const response = await fetch(url, { method: "DELETE" });
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+}
+
 async function apiSend<T>(method: string, path: string, body: unknown): Promise<T> {
   const url = new URL(path, BASE_URL);
   const response = await fetch(url, {
