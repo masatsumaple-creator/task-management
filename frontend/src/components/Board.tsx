@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Card } from "../types/card";
 import Column, { type ColumnData } from "./Column";
 
@@ -5,6 +6,13 @@ interface Props {
   cards: Card[];
   loading: boolean;
   error: string | null;
+  onCardClick: (card: Card) => void;
+  onMoveCard: (cardId: number, listId: number, position: number) => void;
+}
+
+export interface DropTarget {
+  listId: number;
+  index: number;
 }
 
 /**
@@ -24,7 +32,10 @@ function groupByList(cards: Card[]): ColumnData[] {
   return [...map.values()].sort((a, b) => a.listId - b.listId);
 }
 
-export default function Board({ cards, loading, error }: Props) {
+export default function Board({ cards, loading, error, onCardClick, onMoveCard }: Props) {
+  const [draggingCardId, setDraggingCardId] = useState<number | null>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+
   if (loading) {
     return <p className="board-status">読み込み中...</p>;
   }
@@ -38,10 +49,31 @@ export default function Board({ cards, loading, error }: Props) {
     return <p className="board-status">該当するカードがありません。</p>;
   }
 
+  function handleDrop() {
+    if (draggingCardId != null && dropTarget != null) {
+      onMoveCard(draggingCardId, dropTarget.listId, dropTarget.index);
+    }
+    setDraggingCardId(null);
+    setDropTarget(null);
+  }
+
   return (
     <div className="board">
       {columns.map((column) => (
-        <Column key={column.listId} column={column} />
+        <Column
+          key={column.listId}
+          column={column}
+          onCardClick={onCardClick}
+          draggingCardId={draggingCardId}
+          dropTarget={dropTarget}
+          onDragStartCard={setDraggingCardId}
+          onDragEnd={() => {
+            setDraggingCardId(null);
+            setDropTarget(null);
+          }}
+          onDragOverColumn={(index) => setDropTarget({ listId: column.listId, index })}
+          onDrop={handleDrop}
+        />
       ))}
     </div>
   );
