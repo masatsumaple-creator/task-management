@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "./client";
+import { apiGet, apiPatch, apiPost, apiPut } from "./client";
 import type { Card, Priority } from "../types/card";
 
 export interface CardSearchFilters {
@@ -12,6 +12,22 @@ export interface CardCreateInput {
   title: string;
   priority: Priority;
   dueDate?: string; // ISO日付文字列（例: "2026-09-20"）、未入力は省略
+}
+
+export interface CardUpdateInput {
+  title: string;
+  priority: Priority;
+  dueDate?: string; // ISO日付文字列（例: "2026-09-20"）、未入力は省略
+}
+
+export interface CardMoveInput {
+  listId: number;
+  position: number;
+}
+
+export interface CardReorderInput {
+  listId: number;
+  cardIds: number[];
 }
 
 /**
@@ -36,5 +52,39 @@ export function createCard(input: CardCreateInput): Promise<Card> {
     title: input.title,
     priority: input.priority,
     dueDate: input.dueDate || null,
+  });
+}
+
+/**
+ * PUT /api/cards/{id} を呼び出してカードの詳細（タイトル・優先度・期日）を更新する。
+ * バックエンド: backend/src/main/java/com/taskmanagement/backend/controller/CardController.java
+ */
+export function updateCard(id: number, input: CardUpdateInput): Promise<Card> {
+  return apiPut<Card>(`/api/cards/${id}`, {
+    title: input.title,
+    priority: input.priority,
+    dueDate: input.dueDate || null,
+  });
+}
+
+/**
+ * PATCH /api/cards/{id}/position を呼び出してカードをドラッグ&ドロップで移動する。
+ * バックエンド: backend/src/main/java/com/taskmanagement/backend/controller/CardController.java
+ */
+export function moveCard(id: number, input: CardMoveInput): Promise<Card> {
+  return apiPatch<Card>(`/api/cards/${id}/position`, {
+    listId: input.listId,
+    position: input.position,
+  });
+}
+
+/**
+ * PUT /api/cards/reorder を呼び出して、リスト内のカードを指定順に一括で並び替える。
+ * バックエンド: backend/src/main/java/com/taskmanagement/backend/controller/CardController.java
+ */
+export function reorderCards(input: CardReorderInput): Promise<void> {
+  return apiPut<void>("/api/cards/reorder", {
+    listId: input.listId,
+    cardIds: input.cardIds,
   });
 }

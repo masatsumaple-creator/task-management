@@ -27,14 +27,37 @@ export async function apiGet<T>(
  * body は JSON としてシリアライズして送信する。
  */
 export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  return apiSend<T>("POST", path, body);
+}
+
+/**
+ * バックエンドAPIへの PUT リクエストを行う共通関数。
+ * body は JSON としてシリアライズして送信する。
+ */
+export async function apiPut<T>(path: string, body: unknown): Promise<T> {
+  return apiSend<T>("PUT", path, body);
+}
+
+/**
+ * バックエンドAPIへの PATCH リクエストを行う共通関数。
+ * body は JSON としてシリアライズして送信する。
+ */
+export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
+  return apiSend<T>("PATCH", path, body);
+}
+
+async function apiSend<T>(method: string, path: string, body: unknown): Promise<T> {
   const url = new URL(path, BASE_URL);
   const response = await fetch(url, {
-    method: "POST",
+    method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  if (response.status === 204) {
+    return undefined as T;
   }
   return response.json() as Promise<T>;
 }

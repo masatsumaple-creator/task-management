@@ -1,5 +1,7 @@
 package com.taskmanagement.backend.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -14,4 +16,7 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
 
 	/** 新規カードを末尾に追加する際の position 算出に使う。 */
 	long countByList(TaskList list);
+
+	/** カード移動時の position 再採番に使う。position 昇順で返す。 */
+	List<Card> findByListOrderByPositionAsc(TaskList list);
 }

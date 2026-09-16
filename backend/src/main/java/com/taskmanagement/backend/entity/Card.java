@@ -81,6 +81,10 @@ public class Card {
 		return list;
 	}
 
+	public void setList(TaskList list) {
+		this.list = list;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -107,6 +111,10 @@ public class Card {
 
 	public int getPosition() {
 		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 
 	public LocalDateTime getCreatedAt() {
