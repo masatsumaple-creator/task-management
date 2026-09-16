@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { Card, Priority } from "../types/card";
-import { updateCard } from "../api/cards";
+import { deleteCard, updateCard } from "../api/cards";
 
 interface Props {
   card: Card;
   onClose: () => void;
   onUpdated: () => void;
+  onDeleted: () => void;
 }
 
 const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
@@ -14,12 +15,13 @@ const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: "low", label: "低" },
 ];
 
-export default function CardDetailModal({ card, onClose, onUpdated }: Props) {
+export default function CardDetailModal({ card, onClose, onUpdated, onDeleted }: Props) {
   const [title, setTitle] = useState(card.title);
   const [priority, setPriority] = useState<Priority>(card.priority);
   const [dueDate, setDueDate] = useState(card.dueDate ?? "");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,6 +45,24 @@ export default function CardDetailModal({ card, onClose, onUpdated }: Props) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!window.confirm("このカードを削除します。この操作は取り消せません。よろしいですか？")) {
+      return;
+    }
+
+    setDeleting(true);
+    setError(null);
+    try {
+      await deleteCard(card.id);
+      onDeleted();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -90,10 +110,18 @@ export default function CardDetailModal({ card, onClose, onUpdated }: Props) {
             />
           </label>
           <div className="modal__actions">
-            <button type="button" onClick={onClose} disabled={submitting}>
+            <button
+              type="button"
+              className="modal__delete"
+              onClick={handleDelete}
+              disabled={submitting || deleting}
+            >
+              {deleting ? "削除中..." : "削除"}
+            </button>
+            <button type="button" onClick={onClose} disabled={submitting || deleting}>
               キャンセル
             </button>
-            <button type="submit" disabled={submitting}>
+            <button type="submit" disabled={submitting || deleting}>
               {submitting ? "保存中..." : "保存"}
             </button>
           </div>

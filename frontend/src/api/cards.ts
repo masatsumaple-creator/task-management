@@ -1,4 +1,4 @@
-import { apiGet, apiPatch, apiPost, apiPut } from "./client";
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "./client";
 import type { Card, Priority } from "../types/card";
 
 export interface CardSearchFilters {
@@ -87,4 +87,12 @@ export function reorderCards(input: CardReorderInput): Promise<void> {
     listId: input.listId,
     cardIds: input.cardIds,
   });
+}
+
+/**
+ * DELETE /api/cards/{id} を呼び出してカードを物理削除する。
+ * バックエンド: backend/src/main/java/com/taskmanagement/backend/controller/CardController.java
+ */
+export function deleteCard(id: number): Promise<void> {
+  return apiDelete(`/api/cards/${id}`);
 }
