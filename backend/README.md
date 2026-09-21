@@ -74,6 +74,13 @@ Dockerを使わずに素早く疎通確認したい場合は、`h2` プロファ
 - JDBC URL: `jdbc:h2:mem:taskboard`
 - ユーザー名: `sa` / パスワード: なし
 
+## 初期データ
+
+DBが空（`boards` が0件）の状態で起動すると、[InitialDataSeeder](src/main/java/com/taskmanagement/backend/config/InitialDataSeeder.java) がボード「マイボード」と初期リスト（To Do / 進行中 / 完了）を作成する。既にデータがある場合は何もしない。
+
+- サンプルカード（動作確認用の7件）は、`app.seed.sample-cards=true` のときだけ投入する。既定（PostgreSQL）では投入しない。
+- `h2` プロファイルでは `application-h2.properties` で `true` にしているため、サンプルカードつきで起動する。環境変数 `APP_SEED_SAMPLE_CARDS=false` で無効にできる。
+
 ## 今後の予定
 
 - Board（ボード）に対するREST APIの実装（現状は単一ボード運用のため未着手）

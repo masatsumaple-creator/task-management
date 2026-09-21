@@ -2,6 +2,7 @@ package com.taskmanagement.backend.config;
 
 import java.time.LocalDate;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -14,25 +15,33 @@ import com.taskmanagement.backend.repository.CardRepository;
 import com.taskmanagement.backend.repository.TaskListRepository;
 
 /**
- * READ API（{@link com.taskmanagement.backend.controller.CardController}）の動作確認用に、
- * 起動時にPostgreSQLへテストデータを投入する。
- * 既にデータが存在する場合（{@code boards} が1件以上ある場合）は何もしない。
+ * 起動時にDBが空（{@code boards} が0件）の場合のみ、初期データを投入する。
+ * 既にデータが存在する場合は何もしない。
+ *
+ * <ul>
+ *   <li>常に投入: ボード「マイボード」と、初期リスト（To Do / 進行中 / 完了）</li>
+ *   <li>{@code app.seed.sample-cards=true} の場合のみ: 動作確認用のサンプルカード
+ *       （Dockerなしで試す {@code h2} プロファイルで有効。PostgreSQLの既定では投入しない）</li>
+ * </ul>
  */
 @Component
-public class TestDataSeeder implements CommandLineRunner {
+public class InitialDataSeeder implements CommandLineRunner {
 
 	private final BoardRepository boardRepository;
 	private final TaskListRepository taskListRepository;
 	private final CardRepository cardRepository;
+	private final boolean sampleCards;
 
-	public TestDataSeeder(
+	public InitialDataSeeder(
 			BoardRepository boardRepository,
 			TaskListRepository taskListRepository,
-			CardRepository cardRepository
+			CardRepository cardRepository,
+			@Value("${app.seed.sample-cards:false}") boolean sampleCards
 	) {
 		this.boardRepository = boardRepository;
 		this.taskListRepository = taskListRepository;
 		this.cardRepository = cardRepository;
+		this.sampleCards = sampleCards;
 	}
 
 	@Override
@@ -47,6 +56,12 @@ public class TestDataSeeder implements CommandLineRunner {
 		TaskList inProgress = taskListRepository.save(new TaskList(board, "進行中", 1));
 		TaskList done = taskListRepository.save(new TaskList(board, "完了", 2));
 
+		if (sampleCards) {
+			seedSampleCards(todo, inProgress, done);
+		}
+	}
+
+	private void seedSampleCards(TaskList todo, TaskList inProgress, TaskList done) {
 		LocalDate today = LocalDate.now();
 
 		cardRepository.save(new Card(todo, "要件定義書のレビュー", Priority.HIGH, today.plusDays(2), 0));
