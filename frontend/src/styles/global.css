@@ -72,6 +72,23 @@ body {
   color: #de350b;
 }
 
+.board-status__retry {
+  margin-left: 0.75rem;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #ffebe6;
+  border: 1px solid #ff8f73;
+  border-radius: 4px;
+  color: #bf2600;
+  font-size: 0.9rem;
+}
+
 .board {
   display: flex;
   gap: 0.75rem;
