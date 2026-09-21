@@ -6,6 +6,7 @@ interface Props {
   cards: Card[];
   loading: boolean;
   error: string | null;
+  onRetry: () => void;
   onCardClick: (card: Card) => void;
   onMoveCard: (cardId: number, listId: number, position: number) => void;
 }
@@ -33,7 +34,7 @@ function groupByList(cards: Card[]): ColumnData[] {
   return [...map.values()].sort((a, b) => a.listId - b.listId);
 }
 
-export default function Board({ cards, loading, error, onCardClick, onMoveCard }: Props) {
+export default function Board({ cards, loading, error, onRetry, onCardClick, onMoveCard }: Props) {
   const [draggingCardId, setDraggingCardId] = useState<number | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
 
@@ -41,7 +42,14 @@ export default function Board({ cards, loading, error, onCardClick, onMoveCard }
     return <p className="board-status">読み込み中...</p>;
   }
   if (error) {
-    return <p className="board-status board-status--error">エラー: {error}</p>;
+    return (
+      <p className="board-status board-status--error" role="alert">
+        {error}
+        <button type="button" className="board-status__retry" onClick={onRetry}>
+          再試行
+        </button>
+      </p>
+    );
   }
 
   const columns = groupByList(cards);

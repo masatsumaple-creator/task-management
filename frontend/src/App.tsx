@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import SearchBar from "./components/SearchBar";
 import SortBar from "./components/SortBar";
 import Board from "./components/Board";
+import ErrorBanner from "./components/ErrorBanner";
 import CardForm from "./components/CardForm";
 import CardDetailModal from "./components/CardDetailModal";
 import { moveCard, reorderCards, searchCards, type CardSearchFilters } from "./api/cards";
@@ -13,23 +14,27 @@ export default function App() {
   const [filters, setFilters] = useState<CardSearchFilters>({});
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // 一覧の取得失敗はボード領域に（再試行つきで）、移動・並び替えの失敗はバナーで表示する。
+  // 後者はボードを置き換えないので、表示中のカードは失われない。
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [sorting, setSorting] = useState(false);
 
   async function handleMoveCard(cardId: number, listId: number, position: number) {
+    setActionError(null);
     try {
       await moveCard(cardId, { listId, position });
       setRefreshKey((key) => key + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setActionError(err instanceof Error ? err.message : String(err));
     }
   }
 
   async function handleSort(criteria: SortCriteria) {
     setSorting(true);
-    setError(null);
+    setActionError(null);
     try {
       // 絞り込み中でもリスト全体を正しく並び替えられるよう、検索条件を無視した全カードを取得する。
       const allCards = await searchCards();
@@ -44,7 +49,7 @@ export default function App() {
       );
       setRefreshKey((key) => key + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setActionError(err instanceof Error ? err.message : String(err));
     } finally {
       setSorting(false);
     }
@@ -55,12 +60,12 @@ export default function App() {
 
     async function load() {
       setLoading(true);
-      setError(null);
+      setLoadError(null);
       try {
         const result = await searchCards(filters);
         if (!cancelled) setCards(result);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        if (!cancelled) setLoadError(err instanceof Error ? err.message : String(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -82,10 +87,12 @@ export default function App() {
         <CardForm onCreated={() => setRefreshKey((key) => key + 1)} />
         <SearchBar filters={filters} onChange={setFilters} />
         <SortBar onSort={handleSort} sorting={sorting} />
+        {actionError && <ErrorBanner message={actionError} onDismiss={() => setActionError(null)} />}
         <Board
           cards={cards}
           loading={loading}
-          error={error}
+          error={loadError}
+          onRetry={() => setRefreshKey((key) => key + 1)}
           onCardClick={setSelectedCard}
           onMoveCard={handleMoveCard}
         />
