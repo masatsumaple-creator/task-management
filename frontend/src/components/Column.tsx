@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Card } from "../types/card";
 import type { DropTarget } from "./Board";
 import CardItem from "./CardItem";
@@ -18,6 +18,8 @@ interface Props {
   onDragEnd: () => void;
   onDragOverColumn: (index: number) => void;
   onDrop: () => void;
+  onRename: (listId: number, title: string) => void;
+  onDelete: (listId: number) => void;
 }
 
 export default function Column({
@@ -29,8 +31,31 @@ export default function Column({
   onDragEnd,
   onDragOverColumn,
   onDrop,
+  onRename,
+  onDelete,
 }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
+  const [draftTitle, setDraftTitle] = useState(column.listTitle);
+
+  function commitTitle() {
+    const trimmed = draftTitle.trim();
+    if (!trimmed || trimmed === column.listTitle) {
+      setDraftTitle(column.listTitle);
+      return;
+    }
+    onRename(column.listId, trimmed);
+  }
+
+  function handleDelete() {
+    // 絞り込み中は非表示のカードも含めて削除されるため、カード数に関わらず常に確認する。
+    if (
+      window.confirm(
+        `リスト「${column.listTitle}」を削除しますか？リスト内のカードもすべて削除されます。`
+      )
+    ) {
+      onDelete(column.listId);
+    }
+  }
 
   function handleDragStart(cardId: number) {
     return (e: React.DragEvent<HTMLDivElement>) => {
@@ -55,7 +80,34 @@ export default function Column({
 
   return (
     <section className="column">
-      <h2 className="column__title">{column.listTitle}</h2>
+      <div className="column__header">
+        <h2 className="column__title">
+          <input
+            className="column__title-input"
+            value={draftTitle}
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onBlur={commitTitle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+              if (e.key === "Escape") {
+                setDraftTitle(column.listTitle);
+                e.currentTarget.blur();
+              }
+            }}
+            aria-label="リスト名"
+            maxLength={255}
+          />
+        </h2>
+        <button
+          type="button"
+          className="column__delete"
+          onClick={handleDelete}
+          aria-label={`リスト「${column.listTitle}」を削除`}
+          title="リストを削除"
+        >
+          ✕
+        </button>
+      </div>
       <ul
         className="column__cards"
         ref={listRef}

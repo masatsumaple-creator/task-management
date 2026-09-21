@@ -9,6 +9,9 @@ Board / List / Card のJPAエンティティ・リポジトリと、Card / List 
 | メソッド | パス | 内容 |
 | --- | --- | --- |
 | GET | `/api/lists` | リスト一覧取得（position順） |
+| POST | `/api/lists` | リスト新規登録（末尾に追加） |
+| PUT | `/api/lists/{id}` | リスト名の更新 |
+| DELETE | `/api/lists/{id}` | リスト削除（物理削除。リスト内のカードも削除し、残りのリストのpositionを詰め直す） |
 | GET | `/api/cards` | カード検索（`keyword` / `priority` / `listId` で絞り込み） |
 | GET | `/api/cards/{id}` | カード単体取得 |
 | POST | `/api/cards` | カード新規登録 |

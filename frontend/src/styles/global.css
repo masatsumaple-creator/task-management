@@ -107,12 +107,76 @@ body {
   flex-shrink: 0;
 }
 
+.column__header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
 .column__title {
+  flex: 1;
+  min-width: 0;
   font-size: 0.95rem;
-  margin: 0 0 0.5rem 0.2rem;
+  margin: 0;
+}
+
+.column__title-input {
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+}
+
+.column__title-input:hover {
+  background: rgba(9, 30, 66, 0.06);
+}
+
+.column__title-input:focus {
+  background: #fff;
+  border-color: #0052cc;
+  outline: none;
+}
+
+.column__delete {
+  border: none;
+  background: transparent;
+  color: #5e6c84;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+}
+
+.column__delete:hover {
+  background: #ffebe6;
+  color: #bf2600;
+}
+
+.add-list-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 260px;
+  max-width: 260px;
+  flex-shrink: 0;
+  padding: 0.6rem;
+  border: 1px dashed #c1c7d0;
+  border-radius: 6px;
+}
+
+.add-list-form input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .column__cards {
+  min-height: 2.5rem; /* カードが0件でもドロップできる高さを確保する */
   list-style: none;
   margin: 0;
   padding: 0;
