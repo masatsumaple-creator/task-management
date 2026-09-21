@@ -1,14 +1,20 @@
 import { useState } from "react";
 import type { Card } from "../types/card";
+import type { TaskList } from "../types/list";
+import AddListForm from "./AddListForm";
 import Column, { type ColumnData } from "./Column";
 
 interface Props {
+  lists: TaskList[];
   cards: Card[];
   loading: boolean;
   error: string | null;
   onRetry: () => void;
   onCardClick: (card: Card) => void;
   onMoveCard: (cardId: number, listId: number, position: number) => void;
+  onAddList: (title: string) => Promise<boolean>;
+  onRenameList: (listId: number, title: string) => void;
+  onDeleteList: (listId: number) => void;
 }
 
 export interface DropTarget {
@@ -17,24 +23,31 @@ export interface DropTarget {
 }
 
 /**
- * 検索結果のカード配列を listId でグルーピングして列（リスト）に組み立てる。
- *
- * 既知の制約: このグルーピングは検索結果の `cards` のみから列を組み立てるため、
- * 検索条件に一致するカードが1件もないリストは列自体が表示されない
- * （`GET /api/lists` 自体は存在するが、ここでは利用していない）。
+ * リストごとに、そのリストに属するカードを position 順に並べて列を組み立てる。
+ * カードが0件のリストも列として表示する（空のリストへもカードを移動できるようにするため）。
  */
-function groupByList(cards: Card[]): ColumnData[] {
-  const map = new Map<number, ColumnData>();
-  for (const card of cards) {
-    if (!map.has(card.listId)) {
-      map.set(card.listId, { listId: card.listId, listTitle: card.listTitle, cards: [] });
-    }
-    map.get(card.listId)!.cards.push(card);
-  }
-  return [...map.values()].sort((a, b) => a.listId - b.listId);
+function buildColumns(lists: TaskList[], cards: Card[]): ColumnData[] {
+  return lists.map((list) => ({
+    listId: list.id,
+    listTitle: list.title,
+    cards: cards
+      .filter((card) => card.listId === list.id)
+      .sort((a, b) => a.position - b.position),
+  }));
 }
 
-export default function Board({ cards, loading, error, onRetry, onCardClick, onMoveCard }: Props) {
+export default function Board({
+  lists,
+  cards,
+  loading,
+  error,
+  onRetry,
+  onCardClick,
+  onMoveCard,
+  onAddList,
+  onRenameList,
+  onDeleteList,
+}: Props) {
   const [draggingCardId, setDraggingCardId] = useState<number | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
 
@@ -52,11 +65,7 @@ export default function Board({ cards, loading, error, onRetry, onCardClick, onM
     );
   }
 
-  const columns = groupByList(cards);
-
-  if (columns.length === 0) {
-    return <p className="board-status">該当するカードがありません。</p>;
-  }
+  const columns = buildColumns(lists, cards);
 
   function handleDrop() {
     if (draggingCardId != null && dropTarget != null) {
@@ -82,8 +91,11 @@ export default function Board({ cards, loading, error, onRetry, onCardClick, onM
           }}
           onDragOverColumn={(index) => setDropTarget({ listId: column.listId, index })}
           onDrop={handleDrop}
+          onRename={onRenameList}
+          onDelete={onDeleteList}
         />
       ))}
+      <AddListForm onAdd={onAddList} />
     </div>
   );
 }

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Priority } from "../types/card";
 import type { TaskList } from "../types/list";
-import { fetchLists } from "../api/lists";
 import { createCard } from "../api/cards";
 
 interface Props {
+  lists: TaskList[];
   onCreated: () => void;
 }
 
@@ -14,25 +14,20 @@ const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: "low", label: "低" },
 ];
 
-export default function CardForm({ onCreated }: Props) {
-  const [lists, setLists] = useState<TaskList[]>([]);
-  const [listId, setListId] = useState("");
+export default function CardForm({ lists, onCreated }: Props) {
+  const [selectedListId, setListId] = useState("");
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [dueDate, setDueDate] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchLists()
-      .then((result) => {
-        setLists(result);
-        if (result.length > 0) setListId(String(result[0].id));
-      })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : String(err));
-      });
-  }, []);
+  // 登録先が未選択、または選択中のリストが削除された場合は、先頭のリストを選ぶ。
+  const listId = lists.some((list) => String(list.id) === selectedListId)
+    ? selectedListId
+    : lists.length > 0
+      ? String(lists[0].id)
+      : "";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

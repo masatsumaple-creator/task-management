@@ -19,4 +19,7 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
 
 	/** カード移動時の position 再採番に使う。position 昇順で返す。 */
 	List<Card> findByListOrderByPositionAsc(TaskList list);
+
+	/** リスト削除時に、そのリストのカードをまとめて削除する。呼び出し側でトランザクションを張ること。 */
+	void deleteByList(TaskList list);
 }
