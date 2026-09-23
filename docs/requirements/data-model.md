@@ -2,36 +2,9 @@
 
 [← 要件定義書に戻る](../requirements.md)
 
-## 現在のデータモデル（localStorage / JSON）
+## ER図（`backend/` / `frontend/` で実装済み）
 
-状態はひとつのJSONオブジェクトとして保持し、`localStorage` のキー `task-board-state-v1` に文字列化して保存する。
-
-```json
-{
-  "lists": [
-    {
-      "id": "string (一意なID)",
-      "title": "string",
-      "cards": [
-        {
-          "id": "string (一意なID)",
-          "title": "string",
-          "priority": "high | medium | low",
-          "dueDate": "string (YYYY-MM-DD、未設定は空文字)"
-        }
-      ]
-    }
-  ]
-}
-```
-
-リスト・カードの並び順は配列の並び順そのものが表す。IDは追加時に生成し、削除・移動時にも変更しない。ボードは1つのみで、ボード自体をIDで管理する概念は持たない。
-
-`priority` はカードの優先度を3段階（`high` / `medium` / `low`）で表し、カード作成時は既定値として `medium` を設定する。`dueDate` はカードの期限日で、未入力の場合は空文字を保持する。期限日が本日より過去の場合、画面上は期限超過として強調表示する。
-
-## DB移行後のER図（`backend/` / `frontend/` で実装済み）
-
-`localStorage` からデータベース（RDB）へ移行し、サーバー経由で運用する構成として設計したテーブル構成。この構成は `backend/`（Spring Boot + PostgreSQL）・`frontend/`（React + Vite）側で既に実装されている（ルート直下のMVP版・`index.html`/`app.js` は引き続き `localStorage` のままで、上記の現行データモデルを使用する）。現行スコープ（単一ボード・単一ユーザー・ログインなし）に合わせた最小構成とし、`boards` テーブルもあらかじめ用意することで、[拡張候補](roadmap.md)にある複数ボード対応への移行時にテーブル追加なしで対応できるようにしている。
+サーバー（PostgreSQL）で管理するテーブル構成。現行スコープ（単一ボード・単一ユーザー・ログインなし）に合わせた最小構成とし、`boards` テーブルもあらかじめ用意することで、[拡張候補](roadmap.md)にある複数ボード対応への移行時にテーブル追加なしで対応できるようにしている。
 
 ```mermaid
 erDiagram
@@ -64,17 +37,15 @@ erDiagram
   }
 ```
 
-**現行（MVP/localStorage）モデルとの主な差分**
-
-- `position`（並び順）列を明示的に追加する。現行はJSON配列の並び順がそのまま順序を表すが、RDBのテーブル行には順序の保証がないため、順序を保持する列が別途必要になる。
-- `created_at` / `updated_at` を追加する。DB運用では作成・更新日時の記録が一般的なため、現行モデルにはない項目として加える。
-- `boards` テーブルを新設する。現行は暗黙的に「ボードは1つ」だが、DBでは明示的な行として管理する。ただし本バージョンのスコープでは1ユーザー1ボード運用とし、`users` テーブルやログイン機能の追加は行わない（[拡張候補](roadmap.md)で別途検討）。
+- `position`（並び順）は、リスト内のカードの表示順・リスト自体の表示順を表す整数。追加時は末尾（現在の件数）に採番し、削除・移動・並び替え時に該当範囲を詰め直す。
+- `created_at` / `updated_at` は行の作成・更新日時。
 - ER図上のカーディナリティは「1つのボードは0件以上のリストを持つ／1つのリストは0件以上のカードを持つ」（`||--o{`）という1対多の関係を表す。
+- `priority` はカードの優先度を3段階（`high` / `medium` / `low`）で表す。`due_date` はカードの期限日で、未設定は `null`。期限日が本日より過去の場合、画面上は期限超過として強調表示する。
 
-**実装（`backend/`）とこのER図との差分**
+## 実装（`backend/`）とこのER図との差分
 
 - 主キーはこの図では `string` としているが、実装では `Long`（`GenerationType.IDENTITY` による自動採番）を採用している。
-- `Board` に対するREST APIは未実装（`GET /api/lists`・`/api/cards` 系のみ実装済み）。現状は1ボード運用のため、`Board` エンティティはあってもAPIからは直接操作しない。
+- `Board` に対するREST APIは未実装（`GET /api/lists`・`/api/cards` 系のみ実装済み）。現状は1ボード運用のため、`Board` エンティティはあってもAPIからは直接操作しない（[backend/README.md](../../backend/README.md)の「今後の予定」を参照）。
 
 ---
 
