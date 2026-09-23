@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * カードの優先度（3段階）。
- * フロントエンド（{@code app.js}）に合わせて、JSON上は小文字（high / medium / low）で表現する。
+ * フロントエンドに合わせて、JSON上は小文字（high / medium / low）で表現する。
  */
 public enum Priority {
 	HIGH,
