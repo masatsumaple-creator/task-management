@@ -8,10 +8,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * カード更新API（PUT /api/cards/{id}）のリクエスト形式。
- * 所属リスト・position の変更はこのAPIでは扱わない（{@link CardMoveRequest} 参照）。
+ * タスク登録API（POST /api/tasks）のリクエスト形式。
+ * dueDate は任意項目のため未指定を許容する。
  */
-public record CardUpdateRequest(
+public record TaskCreateRequest(
+		@NotNull Long listId,
 		@NotBlank String title,
 		@NotNull Priority priority,
 		LocalDate dueDate

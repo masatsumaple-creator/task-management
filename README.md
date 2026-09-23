@@ -1,8 +1,8 @@
 # タスクボード（Task Board）
 
-Trello風の「リスト × カード」形式で、個人のタスクを素早く整理できるシンプルなかんばんボードアプリ。
+Trello風の「リスト × タスク」形式で、個人のタスクを素早く整理できるシンプルなかんばんボードアプリ。
 
-Java / Spring Boot / PostgreSQL のAPIと、React + Vite のSPAで構成する。リストの一覧・追加・名称編集・削除、カードの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。主要なバージョンは[docs/requirements/tech-stack.md](docs/requirements/tech-stack.md)を参照。
+Java / Spring Boot / PostgreSQL のAPIと、React + Vite のSPAで構成する。リストの一覧・追加・名称編集・削除、タスクの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。主要なバージョンは[docs/requirements/tech-stack.md](docs/requirements/tech-stack.md)を参照。
 
 ## 構成
 
@@ -62,7 +62,7 @@ npm test
 | [要件定義書](docs/requirements.md) | 目的・想定ユーザー・スコープ・機能要件のサマリー |
 | [非機能要件](docs/requirements/non-functional.md) | 実行環境・対応ブラウザ、セキュリティ、アクセシビリティ、対応デバイス・画面幅、障害時の挙動 |
 | [画面構成](docs/requirements/screens.md) | ワイヤーフレーム、操作フロー図 |
-| [データモデル](docs/requirements/data-model.md) | DBのER図（boards / lists / cards） |
+| [データモデル](docs/requirements/data-model.md) | DBのER図（boards / lists / tasks） |
 | [制約・前提条件 / 今後の拡張候補](docs/requirements/roadmap.md) | データ保存範囲の制約、優先度付き拡張候補一覧 |
 | [技術スタック](docs/requirements/tech-stack.md) | 採用する技術スタックとバージョン一覧 |
 | [改訂履歴](docs/requirements/changelog.md) | バージョンごとの変更内容 |

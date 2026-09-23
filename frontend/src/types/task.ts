@@ -2,10 +2,10 @@
 export type Priority = "high" | "medium" | "low";
 
 /**
- * GET /api/cards, GET /api/cards/{id} が返す CardResponse に対応する型。
- * バックエンド: backend/src/main/java/com/taskmanagement/backend/dto/CardResponse.java
+ * GET /api/tasks, GET /api/tasks/{id} が返す TaskResponse に対応する型。
+ * バックエンド: backend/src/main/java/com/taskmanagement/backend/dto/TaskResponse.java
  */
-export interface Card {
+export interface Task {
   id: number;
   listId: number;
   listTitle: string;

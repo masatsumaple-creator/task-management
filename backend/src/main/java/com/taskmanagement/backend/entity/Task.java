@@ -16,11 +16,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
- * カード（タスク本体）。データモデル上の {@code CARDS} テーブルに対応する。
+ * タスク。データモデル上の {@code TASKS} テーブルに対応する。
  */
 @Entity
-@Table(name = "cards")
-public class Card {
+@Table(name = "tasks")
+public class Task {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,11 +49,11 @@ public class Card {
 	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
 
-	protected Card() {
+	protected Task() {
 		// JPA用
 	}
 
-	public Card(TaskList list, String title, Priority priority, LocalDate dueDate, int position) {
+	public Task(TaskList list, String title, Priority priority, LocalDate dueDate, int position) {
 		this.list = list;
 		this.title = title;
 		this.priority = priority;

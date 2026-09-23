@@ -72,16 +72,16 @@ class TaskListControllerTest {
 	}
 
 	@Test
-	void deleteRemovesListWithItsCardsAndReindexesPositions() throws Exception {
+	void deleteRemovesListWithItsTasksAndReindexesPositions() throws Exception {
 		long first = createList("削除対象");
 		long second = createList("残るリスト");
-		mockMvc.perform(post("/api/cards").contentType(MediaType.APPLICATION_JSON)
-				.content("{\"listId\":" + first + ",\"title\":\"消えるカード\",\"priority\":\"low\"}"))
+		mockMvc.perform(post("/api/tasks").contentType(MediaType.APPLICATION_JSON)
+				.content("{\"listId\":" + first + ",\"title\":\"消えるタスク\",\"priority\":\"low\"}"))
 				.andExpect(status().isCreated());
 
 		mockMvc.perform(delete("/api/lists/" + first)).andExpect(status().isNoContent());
 
-		mockMvc.perform(get("/api/cards").param("listId", String.valueOf(first)))
+		mockMvc.perform(get("/api/tasks").param("listId", String.valueOf(first)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(0)));
 

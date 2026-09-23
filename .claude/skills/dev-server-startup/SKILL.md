@@ -49,7 +49,7 @@ frontend（5173）、PostgreSQL（5432）についても同様に、`Get-NetTCPC
 起動後は以下で疎通確認する。
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/api/cards
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/api/tasks
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5173/
 ```
 

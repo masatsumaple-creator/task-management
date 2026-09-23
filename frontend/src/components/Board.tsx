@@ -1,17 +1,17 @@
 import { useState } from "react";
-import type { Card } from "../types/card";
+import type { Task } from "../types/task";
 import type { TaskList } from "../types/list";
 import AddListForm from "./AddListForm";
 import Column, { type ColumnData } from "./Column";
 
 interface Props {
   lists: TaskList[];
-  cards: Card[];
+  tasks: Task[];
   loading: boolean;
   error: string | null;
   onRetry: () => void;
-  onCardClick: (card: Card) => void;
-  onMoveCard: (cardId: number, listId: number, position: number) => void;
+  onTaskClick: (task: Task) => void;
+  onMoveTask: (taskId: number, listId: number, position: number) => void;
   onAddList: (title: string) => Promise<boolean>;
   onRenameList: (listId: number, title: string) => void;
   onDeleteList: (listId: number) => void;
@@ -23,32 +23,32 @@ export interface DropTarget {
 }
 
 /**
- * リストごとに、そのリストに属するカードを position 順に並べて列を組み立てる。
- * カードが0件のリストも列として表示する（空のリストへもカードを移動できるようにするため）。
+ * リストごとに、そのリストに属するタスクを position 順に並べて列を組み立てる。
+ * タスクが0件のリストも列として表示する（空のリストへもタスクを移動できるようにするため）。
  */
-function buildColumns(lists: TaskList[], cards: Card[]): ColumnData[] {
+function buildColumns(lists: TaskList[], tasks: Task[]): ColumnData[] {
   return lists.map((list) => ({
     listId: list.id,
     listTitle: list.title,
-    cards: cards
-      .filter((card) => card.listId === list.id)
+    tasks: tasks
+      .filter((task) => task.listId === list.id)
       .sort((a, b) => a.position - b.position),
   }));
 }
 
 export default function Board({
   lists,
-  cards,
+  tasks,
   loading,
   error,
   onRetry,
-  onCardClick,
-  onMoveCard,
+  onTaskClick,
+  onMoveTask,
   onAddList,
   onRenameList,
   onDeleteList,
 }: Props) {
-  const [draggingCardId, setDraggingCardId] = useState<number | null>(null);
+  const [draggingTaskId, setDraggingTaskId] = useState<number | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
 
   if (loading) {
@@ -65,13 +65,13 @@ export default function Board({
     );
   }
 
-  const columns = buildColumns(lists, cards);
+  const columns = buildColumns(lists, tasks);
 
   function handleDrop() {
-    if (draggingCardId != null && dropTarget != null) {
-      onMoveCard(draggingCardId, dropTarget.listId, dropTarget.index);
+    if (draggingTaskId != null && dropTarget != null) {
+      onMoveTask(draggingTaskId, dropTarget.listId, dropTarget.index);
     }
-    setDraggingCardId(null);
+    setDraggingTaskId(null);
     setDropTarget(null);
   }
 
@@ -81,12 +81,12 @@ export default function Board({
         <Column
           key={column.listId}
           column={column}
-          onCardClick={onCardClick}
-          draggingCardId={draggingCardId}
+          onTaskClick={onTaskClick}
+          draggingTaskId={draggingTaskId}
           dropTarget={dropTarget}
-          onDragStartCard={setDraggingCardId}
+          onDragStartTask={setDraggingTaskId}
           onDragEnd={() => {
-            setDraggingCardId(null);
+            setDraggingTaskId(null);
             setDropTarget(null);
           }}
           onDragOverColumn={(index) => setDropTarget({ listId: column.listId, index })}

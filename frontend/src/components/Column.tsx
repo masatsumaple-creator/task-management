@@ -1,20 +1,20 @@
 import { useRef, useState } from "react";
-import type { Card } from "../types/card";
+import type { Task } from "../types/task";
 import type { DropTarget } from "./Board";
-import CardItem from "./CardItem";
+import TaskItem from "./TaskItem";
 
 export interface ColumnData {
   listId: number;
   listTitle: string;
-  cards: Card[];
+  tasks: Task[];
 }
 
 interface Props {
   column: ColumnData;
-  onCardClick: (card: Card) => void;
-  draggingCardId: number | null;
+  onTaskClick: (task: Task) => void;
+  draggingTaskId: number | null;
   dropTarget: DropTarget | null;
-  onDragStartCard: (cardId: number) => void;
+  onDragStartTask: (taskId: number) => void;
   onDragEnd: () => void;
   onDragOverColumn: (index: number) => void;
   onDrop: () => void;
@@ -24,10 +24,10 @@ interface Props {
 
 export default function Column({
   column,
-  onCardClick,
-  draggingCardId,
+  onTaskClick,
+  draggingTaskId,
   dropTarget,
-  onDragStartCard,
+  onDragStartTask,
   onDragEnd,
   onDragOverColumn,
   onDrop,
@@ -47,27 +47,27 @@ export default function Column({
   }
 
   function handleDelete() {
-    // 絞り込み中は非表示のカードも含めて削除されるため、カード数に関わらず常に確認する。
+    // 絞り込み中は非表示のタスクも含めて削除されるため、タスク数に関わらず常に確認する。
     if (
       window.confirm(
-        `リスト「${column.listTitle}」を削除しますか？リスト内のカードもすべて削除されます。`
+        `リスト「${column.listTitle}」を削除しますか？リスト内のタスクもすべて削除されます。`
       )
     ) {
       onDelete(column.listId);
     }
   }
 
-  function handleDragStart(cardId: number) {
+  function handleDragStart(taskId: number) {
     return (e: React.DragEvent<HTMLDivElement>) => {
       e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", String(cardId));
-      onDragStartCard(cardId);
+      e.dataTransfer.setData("text/plain", String(taskId));
+      onDragStartTask(taskId);
     };
   }
 
   function handleDragOver(e: React.DragEvent<HTMLUListElement>) {
     e.preventDefault();
-    const index = computeDropIndex(listRef.current, e.clientY, draggingCardId);
+    const index = computeDropIndex(listRef.current, e.clientY, draggingTaskId);
     onDragOverColumn(index);
   }
 
@@ -109,25 +109,25 @@ export default function Column({
         </button>
       </div>
       <ul
-        className="column__cards"
+        className="column__tasks"
         ref={listRef}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         onDragEnd={onDragEnd}
       >
-        {column.cards.map((card, index) => (
-          <li key={card.id} className="column__card-slot" data-card-id={card.id}>
+        {column.tasks.map((task, index) => (
+          <li key={task.id} className="column__task-slot" data-task-id={task.id}>
             {showIndicator && dropTarget!.index === index && <div className="drop-indicator" />}
-            <CardItem
-              card={card}
-              dragging={card.id === draggingCardId}
-              onClick={() => onCardClick(card)}
-              onDragStart={handleDragStart(card.id)}
+            <TaskItem
+              task={task}
+              dragging={task.id === draggingTaskId}
+              onClick={() => onTaskClick(task)}
+              onDragStart={handleDragStart(task.id)}
             />
           </li>
         ))}
-        {showIndicator && dropTarget!.index >= column.cards.length && (
-          <li className="column__card-slot column__card-slot--indicator">
+        {showIndicator && dropTarget!.index >= column.tasks.length && (
+          <li className="column__task-slot column__task-slot--indicator">
             <div className="drop-indicator" />
           </li>
         )}
@@ -137,21 +137,21 @@ export default function Column({
 }
 
 /**
- * ドロップ位置(Y座標)から、カード同士の中間点を基準に挿入インデックスを求める。
- * ドラッグ中のカード自身は計算から除外し、挿入先の見た目とインデックスがずれないようにする。
+ * ドロップ位置(Y座標)から、タスク同士の中間点を基準に挿入インデックスを求める。
+ * ドラッグ中のタスク自身は計算から除外し、挿入先の見た目とインデックスがずれないようにする。
  */
 function computeDropIndex(
   list: HTMLUListElement | null,
   clientY: number,
-  draggingCardId: number | null
+  draggingTaskId: number | null
 ): number {
   if (!list) return 0;
 
   const slots = [
     ...list.querySelectorAll<HTMLElement>(
-      ":scope > .column__card-slot:not(.column__card-slot--indicator)"
+      ":scope > .column__task-slot:not(.column__task-slot--indicator)"
     ),
-  ].filter((slot) => Number(slot.dataset.cardId) !== draggingCardId);
+  ].filter((slot) => Number(slot.dataset.taskId) !== draggingTaskId);
 
   let index = slots.length;
   for (let i = 0; i < slots.length; i++) {

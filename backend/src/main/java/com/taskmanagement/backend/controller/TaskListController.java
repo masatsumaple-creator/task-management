@@ -19,8 +19,8 @@ import com.taskmanagement.backend.dto.ListUpdateRequest;
 import com.taskmanagement.backend.entity.Board;
 import com.taskmanagement.backend.entity.TaskList;
 import com.taskmanagement.backend.repository.BoardRepository;
-import com.taskmanagement.backend.repository.CardRepository;
 import com.taskmanagement.backend.repository.TaskListRepository;
+import com.taskmanagement.backend.repository.TaskRepository;
 
 import jakarta.validation.Valid;
 
@@ -33,16 +33,16 @@ public class TaskListController {
 
 	private final TaskListRepository taskListRepository;
 	private final BoardRepository boardRepository;
-	private final CardRepository cardRepository;
+	private final TaskRepository taskRepository;
 
 	public TaskListController(
 			TaskListRepository taskListRepository,
 			BoardRepository boardRepository,
-			CardRepository cardRepository
+			TaskRepository taskRepository
 	) {
 		this.taskListRepository = taskListRepository;
 		this.boardRepository = boardRepository;
-		this.cardRepository = cardRepository;
+		this.taskRepository = taskRepository;
 	}
 
 	/** リスト一覧を position 順に取得する。 */
@@ -84,7 +84,7 @@ public class TaskListController {
 	}
 
 	/**
-	 * リストを物理削除する。リスト内のカードもすべて削除し、残りのリストの position を詰め直す。
+	 * リストを物理削除する。リスト内のタスクもすべて削除し、残りのリストの position を詰め直す。
 	 * 対象リストが存在しない場合は404を返す。
 	 */
 	@DeleteMapping("/api/lists/{id}")
@@ -95,7 +95,7 @@ public class TaskListController {
 			return ResponseEntity.notFound().build();
 		}
 
-		cardRepository.deleteByList(list);
+		taskRepository.deleteByList(list);
 		taskListRepository.delete(list);
 
 		List<TaskList> remaining = taskListRepository.findAllByOrderByPositionAsc();

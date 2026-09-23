@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { Priority } from "../types/card";
+import type { Priority } from "../types/task";
 import type { TaskList } from "../types/list";
-import { createCard } from "../api/cards";
+import { createTask } from "../api/tasks";
 
 interface Props {
   lists: TaskList[];
@@ -14,7 +14,7 @@ const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: "low", label: "低" },
 ];
 
-export default function CardForm({ lists, onCreated }: Props) {
+export default function TaskForm({ lists, onCreated }: Props) {
   const [selectedListId, setListId] = useState("");
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
@@ -44,7 +44,7 @@ export default function CardForm({ lists, onCreated }: Props) {
     setSubmitting(true);
     setError(null);
     try {
-      await createCard({
+      await createTask({
         listId: Number(listId),
         title: title.trim(),
         priority,
@@ -61,7 +61,7 @@ export default function CardForm({ lists, onCreated }: Props) {
   }
 
   return (
-    <form className="card-form" onSubmit={handleSubmit}>
+    <form className="task-form" onSubmit={handleSubmit}>
       <select
         value={listId}
         onChange={(e) => setListId(e.target.value)}
@@ -101,7 +101,7 @@ export default function CardForm({ lists, onCreated }: Props) {
       <button type="submit" disabled={submitting}>
         {submitting ? "登録中..." : "登録"}
       </button>
-      {error && <p className="card-form__error">{error}</p>}
+      {error && <p className="task-form__error">{error}</p>}
     </form>
   );
 }

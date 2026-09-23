@@ -74,7 +74,7 @@ npx tsc -b
 
 Checkstyle/Spotless/PMD等の静的解析ツールは導入されていない（`backend/build.gradle.kts` のpluginsを確認して、導入されていれば代わりにそれを実行する）。導入されていない場合は、以下の観点でコードを直接読んでレビューする。新規ツール導入は依頼されない限り行わない。
 
-- **サービス層の有無**: `controller/` のクラスが `repository/` を直接操作していないか（[CardController.java](../../../backend/src/main/java/com/taskmanagement/backend/controller/CardController.java) など）。ビジネスロジック（並び替え・position再採番等）がController内に埋め込まれていないか。
+- **サービス層の有無**: `controller/` のクラスが `repository/` を直接操作していないか（[TaskController.java](../../../backend/src/main/java/com/taskmanagement/backend/controller/TaskController.java) など）。ビジネスロジック（並び替え・position再採番等）がController内に埋め込まれていないか。
 - **例外処理の一元化**: `@ControllerAdvice`/`@ExceptionHandler` があるか。なければ、`ResponseStatusException`や手動nullチェックがControllerごとにバラバラに書かれていないか。
 - **テストカバレッジ**: `backend/src/test/`配下にController/Repositoryのテストがあるか（`contextLoads()`のみでないか）。
 - **パッケージ構成の一貫性**: 全クラスが適切なパッケージ（`controller`/`service`/`repository`/`entity`/`dto`/`config`）に収まっているか。

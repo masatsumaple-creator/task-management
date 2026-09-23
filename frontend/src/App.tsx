@@ -4,31 +4,31 @@ import SearchBar from "./components/SearchBar";
 import SortBar from "./components/SortBar";
 import Board from "./components/Board";
 import ErrorBanner from "./components/ErrorBanner";
-import CardForm from "./components/CardForm";
-import CardDetailModal from "./components/CardDetailModal";
-import { moveCard, reorderCards, searchCards, type CardSearchFilters } from "./api/cards";
+import TaskForm from "./components/TaskForm";
+import TaskDetailModal from "./components/TaskDetailModal";
+import { moveTask, reorderTasks, searchTasks, type TaskSearchFilters } from "./api/tasks";
 import { createList, deleteList, fetchLists, updateList } from "./api/lists";
-import type { Card } from "./types/card";
+import type { Task } from "./types/task";
 import type { TaskList } from "./types/list";
-import { sortCards, type SortCriteria } from "./utils/sort";
+import { sortTasks, type SortCriteria } from "./utils/sort";
 
 export default function App() {
-  const [filters, setFilters] = useState<CardSearchFilters>({});
+  const [filters, setFilters] = useState<TaskSearchFilters>({});
   const [lists, setLists] = useState<TaskList[]>([]);
-  const [cards, setCards] = useState<Card[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   // 一覧の取得失敗はボード領域に（再試行つきで）、移動・並び替えの失敗はバナーで表示する。
-  // 後者はボードを置き換えないので、表示中のカードは失われない。
+  // 後者はボードを置き換えないので、表示中のタスクは失われない。
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sorting, setSorting] = useState(false);
 
-  async function handleMoveCard(cardId: number, listId: number, position: number) {
+  async function handleMoveTask(taskId: number, listId: number, position: number) {
     setActionError(null);
     try {
-      await moveCard(cardId, { listId, position });
+      await moveTask(taskId, { listId, position });
       setRefreshKey((key) => key + 1);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : String(err));
@@ -73,15 +73,15 @@ export default function App() {
     setSorting(true);
     setActionError(null);
     try {
-      // 絞り込み中でもリスト全体を正しく並び替えられるよう、検索条件を無視した全カードを取得する。
-      const allCards = await searchCards();
-      const listIds = [...new Set(allCards.map((card) => card.listId))];
+      // 絞り込み中でもリスト全体を正しく並び替えられるよう、検索条件を無視した全タスクを取得する。
+      const allTasks = await searchTasks();
+      const listIds = [...new Set(allTasks.map((task) => task.listId))];
 
       await Promise.all(
         listIds.map((listId) => {
-          const cardsInList = allCards.filter((card) => card.listId === listId);
-          const sortedIds = sortCards(cardsInList, criteria).map((card) => card.id);
-          return reorderCards({ listId, cardIds: sortedIds });
+          const tasksInList = allTasks.filter((task) => task.listId === listId);
+          const sortedIds = sortTasks(tasksInList, criteria).map((task) => task.id);
+          return reorderTasks({ listId, taskIds: sortedIds });
         })
       );
       setRefreshKey((key) => key + 1);
@@ -99,10 +99,10 @@ export default function App() {
       setLoading(true);
       setLoadError(null);
       try {
-        const [listResult, cardResult] = await Promise.all([fetchLists(), searchCards(filters)]);
+        const [listResult, taskResult] = await Promise.all([fetchLists(), searchTasks(filters)]);
         if (!cancelled) {
           setLists(listResult);
-          setCards(cardResult);
+          setTasks(taskResult);
         }
       } catch (err) {
         if (!cancelled) setLoadError(err instanceof Error ? err.message : String(err));
@@ -129,27 +129,27 @@ export default function App() {
     <div className="app">
       <Header />
       <main className="app-main">
-        <CardForm lists={lists} onCreated={() => setRefreshKey((key) => key + 1)} />
+        <TaskForm lists={lists} onCreated={() => setRefreshKey((key) => key + 1)} />
         <SearchBar filters={filters} onChange={setFilters} />
         <SortBar onSort={handleSort} sorting={sorting} />
         {actionError && <ErrorBanner message={actionError} onDismiss={() => setActionError(null)} />}
         <Board
           lists={visibleLists}
-          cards={cards}
+          tasks={tasks}
           loading={loading}
           error={loadError}
           onRetry={() => setRefreshKey((key) => key + 1)}
-          onCardClick={setSelectedCard}
-          onMoveCard={handleMoveCard}
+          onTaskClick={setSelectedTask}
+          onMoveTask={handleMoveTask}
           onAddList={handleAddList}
           onRenameList={handleRenameList}
           onDeleteList={handleDeleteList}
         />
       </main>
-      {selectedCard && (
-        <CardDetailModal
-          card={selectedCard}
-          onClose={() => setSelectedCard(null)}
+      {selectedTask && (
+        <TaskDetailModal
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
           onUpdated={() => setRefreshKey((key) => key + 1)}
           onDeleted={() => setRefreshKey((key) => key + 1)}
         />

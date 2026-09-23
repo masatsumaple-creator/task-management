@@ -2,14 +2,14 @@ package com.taskmanagement.backend.dto;
 
 import java.time.LocalDate;
 
-import com.taskmanagement.backend.entity.Card;
 import com.taskmanagement.backend.entity.Priority;
+import com.taskmanagement.backend.entity.Task;
 
 /**
- * カード読み取りAPIのレスポンス形式。
+ * タスク読み取りAPIのレスポンス形式。
  * フロントエンドの現行モデル（{@code docs/requirements/data-model.md}）に合わせたフィールド構成。
  */
-public record CardResponse(
+public record TaskResponse(
 		Long id,
 		Long listId,
 		String listTitle,
@@ -19,15 +19,15 @@ public record CardResponse(
 		int position
 ) {
 
-	public static CardResponse from(Card card) {
-		return new CardResponse(
-				card.getId(),
-				card.getList().getId(),
-				card.getList().getTitle(),
-				card.getTitle(),
-				card.getPriority(),
-				card.getDueDate(),
-				card.getPosition()
+	public static TaskResponse from(Task task) {
+		return new TaskResponse(
+				task.getId(),
+				task.getList().getId(),
+				task.getList().getTitle(),
+				task.getTitle(),
+				task.getPriority(),
+				task.getDueDate(),
+				task.getPosition()
 		);
 	}
 }

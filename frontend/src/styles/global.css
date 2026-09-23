@@ -175,8 +175,8 @@ body {
   font-size: 0.9rem;
 }
 
-.column__cards {
-  min-height: 2.5rem; /* カードが0件でもドロップできる高さを確保する */
+.column__tasks {
+  min-height: 2.5rem; /* タスクが0件でもドロップできる高さを確保する */
   list-style: none;
   margin: 0;
   padding: 0;
@@ -185,7 +185,7 @@ body {
   gap: 0.5rem;
 }
 
-.card-item {
+.task-item {
   background: #fff;
   border-radius: 4px;
   padding: 0.5rem 0.6rem;
@@ -193,38 +193,38 @@ body {
   border-left: 4px solid transparent;
 }
 
-.card-item.priority-high {
+.task-item.priority-high {
   border-left-color: #de350b;
 }
 
-.card-item.priority-medium {
+.task-item.priority-medium {
   border-left-color: #ffab00;
 }
 
-.card-item.priority-low {
+.task-item.priority-low {
   border-left-color: #36b37e;
 }
 
-.card-item__title {
+.task-item__title {
   font-size: 0.9rem;
   margin-bottom: 0.3rem;
 }
 
-.card-item__due {
+.task-item__due {
   font-size: 0.78rem;
   color: #5e6c84;
 }
 
-.card-item__due--overdue {
+.task-item__due--overdue {
   color: #de350b;
   font-weight: 700;
 }
 
-.card-item--dragging {
+.task-item--dragging {
   opacity: 0.4;
 }
 
-.column__card-slot {
+.column__task-slot {
   list-style: none;
 }
 
@@ -294,7 +294,7 @@ body {
   background: #ffbdad;
 }
 
-.card-form--modal {
+.task-form--modal {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Board from "./Board";
-import type { Card } from "../types/card";
+import type { Task } from "../types/task";
 import type { TaskList } from "../types/list";
 
 const lists: TaskList[] = [
@@ -9,28 +9,28 @@ const lists: TaskList[] = [
   { id: 2, boardId: 1, title: "完了", position: 1 },
 ];
 
-function card(id: number, listId: number, position: number): Card {
+function task(id: number, listId: number, position: number): Task {
   return {
     id,
     listId,
     listTitle: "",
-    title: `card-${id}`,
+    title: `task-${id}`,
     priority: "medium",
     dueDate: null,
     position,
   };
 }
 
-function renderBoard(cards: Card[], boardLists: TaskList[] = lists) {
+function renderBoard(tasks: Task[], boardLists: TaskList[] = lists) {
   render(
     <Board
       lists={boardLists}
-      cards={cards}
+      tasks={tasks}
       loading={false}
       error={null}
       onRetry={vi.fn()}
-      onCardClick={vi.fn()}
-      onMoveCard={vi.fn()}
+      onTaskClick={vi.fn()}
+      onMoveTask={vi.fn()}
       onAddList={vi.fn().mockResolvedValue(true)}
       onRenameList={vi.fn()}
       onDeleteList={vi.fn()}
@@ -39,16 +39,16 @@ function renderBoard(cards: Card[], boardLists: TaskList[] = lists) {
 }
 
 describe("Board", () => {
-  it("shows a column for every list, including lists without cards", () => {
-    renderBoard([card(1, 1, 0)]);
+  it("shows a column for every list, including lists without tasks", () => {
+    renderBoard([task(1, 1, 0)]);
     const titles = screen.getAllByLabelText("リスト名").map((el) => (el as HTMLInputElement).value);
     expect(titles).toEqual(["To Do", "完了"]);
   });
 
-  it("orders the cards of a list by position", () => {
-    renderBoard([card(1, 1, 1), card(2, 1, 0)]);
-    const cardTitles = screen.getAllByText(/^card-/).map((el) => el.textContent);
-    expect(cardTitles).toEqual(["card-2", "card-1"]);
+  it("orders the tasks of a list by position", () => {
+    renderBoard([task(1, 1, 1), task(2, 1, 0)]);
+    const taskTitles = screen.getAllByText(/^task-/).map((el) => el.textContent);
+    expect(taskTitles).toEqual(["task-2", "task-1"]);
   });
 
   it("still offers adding a list when there are no lists", () => {

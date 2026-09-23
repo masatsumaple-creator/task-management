@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Card, Priority } from "../types/card";
-import { deleteCard, updateCard } from "../api/cards";
+import type { Task, Priority } from "../types/task";
+import { deleteTask, updateTask } from "../api/tasks";
 
 interface Props {
-  card: Card;
+  task: Task;
   onClose: () => void;
   onUpdated: () => void;
   onDeleted: () => void;
@@ -15,10 +15,10 @@ const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: "low", label: "低" },
 ];
 
-export default function CardDetailModal({ card, onClose, onUpdated, onDeleted }: Props) {
-  const [title, setTitle] = useState(card.title);
-  const [priority, setPriority] = useState<Priority>(card.priority);
-  const [dueDate, setDueDate] = useState(card.dueDate ?? "");
+export default function TaskDetailModal({ task, onClose, onUpdated, onDeleted }: Props) {
+  const [title, setTitle] = useState(task.title);
+  const [priority, setPriority] = useState<Priority>(task.priority);
+  const [dueDate, setDueDate] = useState(task.dueDate ?? "");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -34,7 +34,7 @@ export default function CardDetailModal({ card, onClose, onUpdated, onDeleted }:
     setSubmitting(true);
     setError(null);
     try {
-      await updateCard(card.id, {
+      await updateTask(task.id, {
         title: title.trim(),
         priority,
         dueDate: dueDate || undefined,
@@ -49,14 +49,14 @@ export default function CardDetailModal({ card, onClose, onUpdated, onDeleted }:
   }
 
   async function handleDelete() {
-    if (!window.confirm("このカードを削除します。この操作は取り消せません。よろしいですか？")) {
+    if (!window.confirm("このタスクを削除します。この操作は取り消せません。よろしいですか？")) {
       return;
     }
 
     setDeleting(true);
     setError(null);
     try {
-      await deleteCard(card.id);
+      await deleteTask(task.id);
       onDeleted();
       onClose();
     } catch (err) {
@@ -72,11 +72,11 @@ export default function CardDetailModal({ card, onClose, onUpdated, onDeleted }:
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label="カード詳細"
+        aria-label="タスク詳細"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="modal__title">カード詳細</h2>
-        <form className="card-form card-form--modal" onSubmit={handleSubmit}>
+        <h2 className="modal__title">タスク詳細</h2>
+        <form className="task-form task-form--modal" onSubmit={handleSubmit}>
           <label className="modal__field">
             タイトル
             <input
@@ -125,7 +125,7 @@ export default function CardDetailModal({ card, onClose, onUpdated, onDeleted }:
               {submitting ? "保存中..." : "保存"}
             </button>
           </div>
-          {error && <p className="card-form__error">{error}</p>}
+          {error && <p className="task-form__error">{error}</p>}
         </form>
       </div>
     </div>

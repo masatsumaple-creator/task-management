@@ -1,9 +1,9 @@
-import type { Priority } from "../types/card";
-import type { CardSearchFilters } from "../api/cards";
+import type { Priority } from "../types/task";
+import type { TaskSearchFilters } from "../api/tasks";
 
 interface Props {
-  filters: CardSearchFilters;
-  onChange: (filters: CardSearchFilters) => void;
+  filters: TaskSearchFilters;
+  onChange: (filters: TaskSearchFilters) => void;
 }
 
 const PRIORITY_OPTIONS: { value: Priority | ""; label: string }[] = [

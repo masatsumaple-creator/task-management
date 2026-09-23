@@ -1,37 +1,37 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import CardItem from "./CardItem";
-import type { Card } from "../types/card";
+import TaskItem from "./TaskItem";
+import type { Task } from "../types/task";
 
-const baseCard: Card = {
+const baseTask: Task = {
   id: 1,
   listId: 1,
   listTitle: "To Do",
-  title: "サンプルカード",
+  title: "サンプルタスク",
   priority: "high",
   dueDate: null,
   position: 0,
 };
 
-describe("CardItem", () => {
+describe("TaskItem", () => {
   it("renders the title and due date", () => {
-    render(<CardItem card={{ ...baseCard, dueDate: "2999-01-01" }} />);
-    expect(screen.getByText("サンプルカード")).toBeInTheDocument();
+    render(<TaskItem task={{ ...baseTask, dueDate: "2999-01-01" }} />);
+    expect(screen.getByText("サンプルタスク")).toBeInTheDocument();
     expect(screen.getByText(/2999-01-01/)).toBeInTheDocument();
   });
 
   it("applies the priority class", () => {
-    const { container } = render(<CardItem card={{ ...baseCard, priority: "low" }} />);
+    const { container } = render(<TaskItem task={{ ...baseTask, priority: "low" }} />);
     expect(container.querySelector(".priority-low")).not.toBeNull();
   });
 
   it("marks a past due date as overdue", () => {
-    render(<CardItem card={{ ...baseCard, dueDate: "2000-01-01" }} />);
+    render(<TaskItem task={{ ...baseTask, dueDate: "2000-01-01" }} />);
     expect(screen.getByText(/期限超過/)).toBeInTheDocument();
   });
 
   it("does not mark a future due date as overdue", () => {
-    render(<CardItem card={{ ...baseCard, dueDate: "2999-01-01" }} />);
+    render(<TaskItem task={{ ...baseTask, dueDate: "2999-01-01" }} />);
     expect(screen.queryByText(/期限超過/)).toBeNull();
   });
 });

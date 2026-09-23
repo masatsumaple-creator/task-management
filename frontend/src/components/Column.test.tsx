@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import Column, { type ColumnData } from "./Column";
 
-const column: ColumnData = { listId: 7, listTitle: "To Do", cards: [] };
+const column: ColumnData = { listId: 7, listTitle: "To Do", tasks: [] };
 
 function renderColumn(overrides: { onRename?: () => void; onDelete?: () => void } = {}) {
   const onRename = overrides.onRename ?? vi.fn();
@@ -10,10 +10,10 @@ function renderColumn(overrides: { onRename?: () => void; onDelete?: () => void 
   render(
     <Column
       column={column}
-      onCardClick={vi.fn()}
-      draggingCardId={null}
+      onTaskClick={vi.fn()}
+      draggingTaskId={null}
       dropTarget={null}
-      onDragStartCard={vi.fn()}
+      onDragStartTask={vi.fn()}
       onDragEnd={vi.fn()}
       onDragOverColumn={vi.fn()}
       onDrop={vi.fn()}
