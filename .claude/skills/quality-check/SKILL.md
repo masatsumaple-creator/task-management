@@ -85,13 +85,12 @@ Checkstyle/Spotless/PMD等の静的解析ツールは導入されていない（
 
 ## 3. ドキュメント整合性チェック
 
-`docs/requirements.md`とその配下（`docs/requirements/*.md`）、および `README.md` / `backend/README.md` / `frontend/README.md` は、**ルート直下のMVP版（`index.html`/`app.js`、localStorage実装）と、`backend`/`frontend`のバックエンド移行版という2つの実装が並存している**ことを前提に読む。「未実装」「対応予定」等の記述は移行版の実装が先行して古くなっていることが多いため、必ず実装側と突き合わせる。
+`docs/requirements.md`とその配下（`docs/requirements/*.md`）、および `README.md` / `backend/README.md` / `frontend/README.md` は、**`backend`/`frontend`（Spring Boot + React + PostgreSQL）の単一実装**を前提に読む。「未実装」「対応予定」等の記述は実装が先行して古くなっていることが多いため、必ず実装側と突き合わせる。
 
 チェック手順：
 1. `backend/src/main/java/.../controller/*.java` の実際のエンドポイント一覧を洗い出す。
 2. `frontend/src/components/`・`frontend/src/api/` で実装済みの機能（作成/編集/削除/D&D/検索/並び替え等）を洗い出す。
-3. 上記1・2と、`docs/requirements/data-model.md`（ER図が「将来構成」のままになっていないか）、`docs/requirements/roadmap.md`（実装済み機能が「候補」のまま残っていないか）、各READMEの「対応済み/未対応」記述を突き合わせ、ズレていれば実態に合わせて修正する。
-4. `docs/requirements.md`本体・`screens.md`・`non-functional.md`・`tech-stack.md`はMVP（静的サイト版）の記述が中心なので、バックエンド移行版の話とは切り分けて判断する（無関係に変更しない）。
+3. 上記1・2と、`docs/requirements/data-model.md`（ER図と実装の差分）、`docs/requirements/roadmap.md`（実装済み機能が「候補」のまま残っていないか）、各READMEの「対応済み/未対応」記述を突き合わせ、ズレていれば実態に合わせて修正する。
 
 ## 参考
 

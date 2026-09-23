@@ -2,28 +2,9 @@
 
 Trello風の「リスト × カード」形式で、個人のタスクを素早く整理できるシンプルなかんばんボードアプリ。
 
-現在、リポジトリには2つの実装が並存している。
+Java / Spring Boot / PostgreSQL のAPIと、React + Vite のSPAで構成する。リストの一覧・追加・名称編集・削除、カードの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。主要なバージョンは[docs/requirements/tech-stack.md](docs/requirements/tech-stack.md)を参照。
 
-| 実装 | 状態 | 内容 |
-| --- | --- | --- |
-| MVP（静的サイト） | 実装済み・単体で動作可能 | ルート直下の `index.html` / `style.css` / `app.js`。サーバー不要、`localStorage` にデータを保存するサーバーレス構成。 |
-| バックエンド移行版 | 実装中 | `backend/`（Spring Boot API）と `frontend/`（React + Vite SPA）。マルチデバイス同期を見据えたサーバー・DB構成。リストの一覧・追加・名称編集・削除、カードの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。 |
-
-どちらを触るかによってセットアップ方法が異なるため、以下を参照。
-
-## 1. MVP（静的サイト版）
-
-インストール・ビルド不要。`index.html` をブラウザで開くだけで動作する。
-
-- 対象ファイル: `index.html` / `style.css` / `app.js`
-- データ保存先: ブラウザの `localStorage`（端末・ブラウザごとに別データ）
-- 対応ブラウザ: Chrome / Edge / Firefox / Safari の最新版
-
-## 2. バックエンド移行版（Spring Boot + React）
-
-[技術スタック](docs/requirements/tech-stack.md)に基づき、Java / Spring Boot / PostgreSQL のAPIと、React + Vite のSPAで構成する。リストの一覧・追加・名称編集・削除、カードの検索・絞り込み・並び替え・作成・編集・削除・ドラッグ&ドロップ移動に対応済み。
-
-### 構成
+## 構成
 
 ```
 backend/    Spring Boot API（http://localhost:8080）
@@ -31,15 +12,13 @@ frontend/   React + Vite フロントエンド（http://localhost:5173）
 docker-compose.yml   PostgreSQL（db サービス、localhost:5432）
 ```
 
-主要なバージョン（Java / Spring Boot / Gradle / React / Vite など）は [docs/requirements/tech-stack.md](docs/requirements/tech-stack.md) を参照。
-
-### 前提
+## 前提
 
 - JDK 17
 - Node.js（Vite 8 / React 19 に対応するバージョン。npmの `package-lock.json` は `lockfileVersion 3` = npm 9以降を想定）
 - Docker（PostgreSQLをコンテナで起動する場合）
 
-### セットアップ・起動手順
+## セットアップ・起動手順
 
 1. 環境変数ファイルを用意する
    ```bash
@@ -62,11 +41,11 @@ docker-compose.yml   PostgreSQL（db サービス、localhost:5432）
    ```
    起動後、`http://localhost:5173` でアクセスできる。詳細は [frontend/README.md](frontend/README.md) を参照。
 
-### ポートについて
+## ポートについて
 
 各サーバーのデフォルトポート（バックエンド 8080 / フロントエンド 5173 / PostgreSQL 5432）は固定運用とする。ポート競合時の対処方針は [CLAUDE.md](CLAUDE.md) を参照。
 
-### テスト
+## テスト
 
 ```bash
 # バックエンド（backend/ ディレクトリ）
@@ -81,11 +60,11 @@ npm test
 | ドキュメント | 内容 |
 | --- | --- |
 | [要件定義書](docs/requirements.md) | 目的・想定ユーザー・スコープ・機能要件のサマリー |
-| [非機能要件](docs/requirements/non-functional.md) | 実行環境・対応ブラウザ、セキュリティ、アクセシビリティ、対応デバイス・画面幅 |
+| [非機能要件](docs/requirements/non-functional.md) | 実行環境・対応ブラウザ、セキュリティ、アクセシビリティ、対応デバイス・画面幅、障害時の挙動 |
 | [画面構成](docs/requirements/screens.md) | ワイヤーフレーム、操作フロー図 |
-| [データモデル](docs/requirements/data-model.md) | 現行の `localStorage` / JSONモデル、DB移行を見据えたER図 |
+| [データモデル](docs/requirements/data-model.md) | DBのER図（boards / lists / cards） |
 | [制約・前提条件 / 今後の拡張候補](docs/requirements/roadmap.md) | データ保存範囲の制約、優先度付き拡張候補一覧 |
-| [技術スタック](docs/requirements/tech-stack.md) | バックエンド移行版で採用する技術スタックとバージョン一覧 |
+| [技術スタック](docs/requirements/tech-stack.md) | 採用する技術スタックとバージョン一覧 |
 | [改訂履歴](docs/requirements/changelog.md) | バージョンごとの変更内容 |
 | [backend/README.md](backend/README.md) | バックエンドの起動・疎通確認・DB接続設定 |
 | [frontend/README.md](frontend/README.md) | フロントエンドの起動・テスト・既知の制約 |

@@ -2,7 +2,7 @@
 
 [← 要件定義書に戻る](../requirements.md)
 
-[拡張候補](roadmap.md)にある「バックエンド（サーバー・DB）導入によるマルチデバイス同期」を実現する際に採用する技術スタックを定める。現行のMVP（HTML/CSS/JS + `localStorage`、サーバーレス）はこのスタック導入前の実装であり、本章はバックエンド移行時の方針を先行して決めておくもの。
+本アプリで採用する技術スタックを定める。
 
 ## 構成
 
@@ -49,7 +49,7 @@
 | --- | --- | --- |
 | React | 19.3.0 | [package.json](../../frontend/package.json) |
 | React DOM | 19.3.0 | [package.json](../../frontend/package.json) |
-| TypeScript | 7.0.2 | [package.json](../../frontend/package.json) |
+| TypeScript | 5.9.3 | [package.json](../../frontend/package.json) |
 | Vite | 8.3.0 | [package.json](../../frontend/package.json) |
 | @vitejs/plugin-react | 6.1.1 | [package.json](../../frontend/package.json) |
 | Vitest | 5.0.0 | [package.json](../../frontend/package.json) |
@@ -57,10 +57,6 @@
 | npm（lockfile形式） | lockfileVersion 3（npm 9以降） | [package-lock.json](../../frontend/package-lock.json) |
 
 依存パッケージの詳細な一覧・バージョンは [frontend/package.json](../../frontend/package.json)・[frontend/package-lock.json](../../frontend/package-lock.json) を正とする。上表は主要なものの抜粋。
-
-## 現行MVPとの関係
-
-[データモデル](data-model.md)のER図（`boards` / `lists` / `cards`）は、このバックエンド移行時の土台としてあらかじめ用意したもの。実装方式が本スタックへ切り替わる際は、要件定義書冒頭の「実装方式」欄もあわせて更新する。
 
 ---
 
