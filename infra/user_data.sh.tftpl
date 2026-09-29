@@ -24,4 +24,7 @@ cd /opt/app
 echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)" > .env
 chmod 600 .env
 
+# buildxプラグインを入れていないため、classicビルダーを使う
+export DOCKER_BUILDKIT=0
+export COMPOSE_DOCKER_CLI_BUILD=0
 docker compose -f docker-compose.prod.yml up -d --build
