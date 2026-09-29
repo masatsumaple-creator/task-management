@@ -79,9 +79,38 @@ budget_email = "<通知先メールアドレス>"
 - [x] IAMユーザー作成・認証設定・動作確認
 - [x] Dockerfile / docker-compose.prod.yml / Terraformコードの作成、`main`へのマージ
 - [x] `terraform plan` による内容確認(作成予定7リソース、エラーなし)
-- [ ] `terraform apply` の実行
-- [ ] EC2上でのアプリ起動確認(`http://<Elastic IP>` へのアクセス)
+- [x] `terraform apply` の実行(EC2・Elastic IP等7リソースを作成済み)
+- [x] EC2上でのアプリ起動確認(自分のPCから`http://<Elastic IP>`へアクセスし、フロント・API双方200 OKを確認)
 - [ ] 課題提出後の `terraform destroy` によるリソース削除
+
+デプロイ済みのURLは `terraform output app_url` で確認できる。
+
+## デプロイ時に見つかった不具合と対応
+
+実際に`terraform apply`してEC2上でアプリを動かす過程で、ローカル開発では気づかなかった不具合が2件見つかった。
+
+1. **`docker compose build`がbuildxを要求して失敗**: EC2にbuildxプラグインを入れていないため。`DOCKER_BUILDKIT=0` / `COMPOSE_DOCKER_CLI_BUILD=0` を設定し、classicビルダーを使うよう`infra/user_data.sh.tftpl`を修正(PR #17)。
+2. **`backend/gradlew`の`CLASSPATH`代入行が破損**: 標準のGradle wrapperスクリプトと異なり、エスケープ文字(`\"`)が値にそのまま混入していた。`java`に渡るクラスパスが不正な文字列になり、`Could not find or load main class org.gradle.wrapper.GradleWrapperMain`でビルドが失敗していた。標準の記述`CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar`に戻して解消(PR #18)。ローカルのDockerコンテナ(`eclipse-temurin:17-jdk`)で`./gradlew --version`を実行するとクリーンな環境で再現・検証できる。
+
+## EC2上での再デプロイ手順(コード変更後)
+
+`main`にマージ済みの最新コードをEC2に反映する場合、インスタンスを作り直さずSSM経由で更新できる。
+
+```powershell
+aws ssm send-command --instance-ids <instance_id> --document-name "AWS-RunShellScript" --parameters '{"commands":[
+  "cd /opt/app",
+  "git fetch origin",
+  "git reset --hard origin/main",
+  "export DOCKER_BUILDKIT=0",
+  "export COMPOSE_DOCKER_CLI_BUILD=0",
+  "docker compose -f docker-compose.prod.yml up -d --build"
+]}' --timeout-seconds 900
+
+# 完了確認
+aws ssm get-command-invocation --command-id <command_id> --instance-id <instance_id>
+```
+
+Dockerの旧イメージ層がキャッシュされて変更が反映されないことがあるため、コード修正を反映したのにビルド結果が変わらない場合は `docker compose build --no-cache` を挟む。
 
 ## 注意点
 
