@@ -68,6 +68,7 @@ npm test
 | [改訂履歴](docs/requirements/changelog.md) | バージョンごとの変更内容 |
 | [backend/README.md](backend/README.md) | バックエンドの起動・疎通確認・DB接続設定 |
 | [frontend/README.md](frontend/README.md) | フロントエンドの起動・テスト・既知の制約 |
+| [インフラ構成](docs/infrastructure.md) | AWS上での構成・設計方針・ディレクトリ構成 |
 | [CLAUDE.md](CLAUDE.md) | このリポジトリでClaude Codeが作業する際の規約（デフォルトポート運用など） |
 
 機能を追加・変更する際は、対象コードと合わせて [docs/requirements.md](docs/requirements.md) および各詳細ドキュメントのスコープ・要件も更新する。

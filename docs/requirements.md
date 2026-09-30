@@ -75,7 +75,7 @@ flowchart LR
 - 複数ボードの切り替え
 - 複数人での共有・同時編集
 - ラベル（色分け）・添付ファイル・説明欄
-- 本番環境へのデプロイ・公開運用（現状はローカル開発環境のみ）
+- 複数ユーザー向けの常時公開運用（AWSへの検証用デプロイ構成は[インフラ構成](infrastructure.md)を参照）
 
 ## 4. 機能要件
 
@@ -129,6 +129,7 @@ flowchart LR
 | [改訂履歴](requirements/changelog.md) | バージョンごとの変更内容（全件） |
 | [backend/README.md](../backend/README.md) | バックエンドの起動・疎通確認・DB接続設定 |
 | [frontend/README.md](../frontend/README.md) | フロントエンドの起動・テスト・既知の制約 |
+| [インフラ構成](infrastructure.md) | AWS上での構成・設計方針・ディレクトリ構成 |
 
 ---
 
