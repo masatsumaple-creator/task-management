@@ -1,4 +1,7 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+// VITE_API_BASE_URL が空文字(同一オリジン経由で呼び出す本番ビルドの設定)の場合、
+// new URL(path, "") は Invalid URL 例外になるため、window.location.origin にフォールバックする。
+const BASE_URL =
+  (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080") || window.location.origin;
 
 /** API呼び出し失敗の種別。 */
 export type ApiErrorKind = "network" | "client" | "server";
