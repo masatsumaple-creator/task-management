@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 }
 
@@ -78,6 +82,84 @@ resource "aws_iam_instance_profile" "ec2" {
   role = aws_iam_role.ec2.name
 }
 
+# --- RDS (PostgreSQL) ---
+
+resource "random_password" "db" {
+  length  = 24
+  special = false
+}
+
+resource "aws_db_subnet_group" "app" {
+  name       = "task-management-db"
+  subnet_ids = data.aws_subnets.default.ids
+}
+
+resource "aws_security_group" "rds" {
+  name        = "task-management-rds"
+  description = "PostgreSQL from the app EC2 only"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    description     = "PostgreSQL from EC2"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_db_instance" "app" {
+  identifier     = "task-management-db"
+  engine         = "postgres"
+  engine_version = "16"
+  instance_class = "db.t4g.micro"
+
+  allocated_storage = 20
+  storage_type      = "gp3"
+
+  db_name  = "taskboard"
+  username = "taskboard"
+  password = random_password.db.result
+
+  db_subnet_group_name   = aws_db_subnet_group.app.name
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  publicly_accessible    = false
+  multi_az               = false
+
+  backup_retention_period = 1
+  skip_final_snapshot     = true
+  deletion_protection     = false
+
+  apply_immediately = true
+}
+
+resource "aws_ssm_parameter" "db_password" {
+  name  = "/task-management/db/password"
+  type  = "SecureString"
+  value = random_password.db.result
+}
+
+resource "aws_iam_role_policy" "ssm_db_password" {
+  name = "task-management-read-db-password"
+  role = aws_iam_role.ec2.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "ssm:GetParameter"
+      Resource = aws_ssm_parameter.db_password.arn
+    }]
+  })
+}
+
 resource "aws_instance" "app" {
   ami                    = data.aws_ssm_parameter.al2023_ami.value
   instance_type          = var.instance_type
@@ -86,8 +168,13 @@ resource "aws_instance" "app" {
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
 
   user_data = templatefile("${path.module}/user_data.sh.tftpl", {
-    repo_url = var.repo_url
-    branch   = var.repo_branch
+    repo_url          = var.repo_url
+    branch            = var.repo_branch
+    region            = var.region
+    db_host           = aws_db_instance.app.address
+    db_name           = aws_db_instance.app.db_name
+    db_username       = aws_db_instance.app.username
+    db_password_param = aws_ssm_parameter.db_password.name
   })
   user_data_replace_on_change = true
 
