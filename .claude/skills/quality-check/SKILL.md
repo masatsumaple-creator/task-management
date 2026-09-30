@@ -1,9 +1,9 @@
 ---
 name: quality-check
-description: Run this project's full quality audit — frontend ESLint (installing/fixing the config if missing), a manual backend code-quality review (no static analysis tool is configured), and a doc-vs-implementation consistency check against docs/requirements/*.md and the READMEs. Use whenever asked for a quality check, lint check, code review across the whole project, or to verify the requirements/screen-design docs still match the actual backend/frontend implementation.
+description: Run this project's full quality audit — frontend ESLint (installing/fixing the config if missing), a manual backend code-quality review (no static analysis tool is configured), a Terraform quality check (fmt/validate + manual review) for infra/, and a doc-vs-implementation consistency check against docs/requirements/*.md and the READMEs. Use whenever asked for a quality check, lint check, code review across the whole project, or to verify the requirements/screen-design/infrastructure docs still match the actual backend/frontend/infra implementation.
 ---
 
-# 品質チェック（フロント lint + バックエンド手動レビュー + ドキュメント整合性）
+# 品質チェック（フロント lint + バックエンド手動レビュー + Terraform + ドキュメント整合性）
 
 このプロジェクトの「全体的な品質チェック」を行うときの標準手順。過去の実行で判明した固有の落とし穴（TypeScriptプレビュー版の混入など）を踏まえている。
 
@@ -83,14 +83,42 @@ Checkstyle/Spotless/PMD等の静的解析ツールは導入されていない（
 
 最後に `./gradlew test`（Windowsでは `.\gradlew.bat test`。Git Bashから`./gradlew`を直接呼ぶと`ClassNotFoundException: GradleWrapperMain`で失敗することがあるため、その場合はPowerShellの`.\gradlew.bat`を使う）を実行し、既存テストが壊れていないことを確認する。
 
-## 3. ドキュメント整合性チェック
+## 3. インフラ（`infra/`）
 
-`docs/requirements.md`とその配下（`docs/requirements/*.md`）、および `README.md` / `backend/README.md` / `frontend/README.md` は、**`backend`/`frontend`（Spring Boot + React + PostgreSQL）の単一実装**を前提に読む。「未実装」「対応予定」等の記述は実装が先行して古くなっていることが多いため、必ず実装側と突き合わせる。
+Terraformコードが存在する場合のみ実施する。専用の静的解析ツール（tflint等）は導入されていない前提で、`terraform`本体のコマンドと目視レビューで行う。
+
+### 3.1 フォーマット・構文チェック
+
+```bash
+cd infra
+terraform fmt -check -diff -recursive
+terraform init -backend=false   # 既にinit済みなら省略可
+terraform validate
+```
+
+- `fmt -check`が差分を報告した場合は`terraform fmt`（`-check`なし）で整形してから再確認する。
+- `validate`は構文・型エラーのみを検出する。実際にAWSへ何か作成・変更されることはない。
+
+### 3.2 目視レビューの観点
+
+- **認証情報の扱い**: パスワード等の秘密情報がリソース定義に直書きされていないか（`random_password`やSSM Parameter Store経由になっているか）。`terraform.tfvars`・`*.tfstate`が`.gitignore`で除外されているか。
+- **公開範囲の最小化**: `aws_security_group`のingressが必要最小限のポート・送信元（固定IPや他のセキュリティグループ参照）に絞られているか。`0.0.0.0/0`を許可しているルールがあれば、意図したもの（例: 80番のみ等）か確認する。
+- **DB等のパブリックアクセス**: `aws_db_instance`等に`publicly_accessible = true`が紛れ込んでいないか。
+- **destroy時の挙動**: `skip_final_snapshot`や`force_destroy`等、`terraform destroy`実行時に意図しない課金・データ保持が発生しない設定になっているか。
+- **タグ・命名の一貫性**: 新規リソースが既存の命名規則・`default_tags`と揃っているか。
+- **State管理**: `terraform plan`の差分に、意図しないリソースの再作成（`# forces replacement`）が含まれていないか。
+
+`terraform plan`はAWS認証情報とネットワーク接続が必要なため、品質チェックの一環としては**コードレビューまでに留め、実際の`plan`/`apply`はユーザーの指示があった場合のみ**実行する。
+
+## 4. ドキュメント整合性チェック
+
+`docs/requirements.md`とその配下（`docs/requirements/*.md`）、`docs/infrastructure.md`（存在する場合）、および `README.md` / `backend/README.md` / `frontend/README.md` は、**`backend`/`frontend`（Spring Boot + React + PostgreSQL）+ `infra`（Terraform）の単一実装**を前提に読む。「未実装」「対応予定」等の記述は実装が先行して古くなっていることが多いため、必ず実装側と突き合わせる。
 
 チェック手順：
 1. `backend/src/main/java/.../controller/*.java` の実際のエンドポイント一覧を洗い出す。
 2. `frontend/src/components/`・`frontend/src/api/` で実装済みの機能（作成/編集/削除/D&D/検索/並び替え等）を洗い出す。
-3. 上記1・2と、`docs/requirements/data-model.md`（ER図と実装の差分）、`docs/requirements/roadmap.md`（実装済み機能が「候補」のまま残っていないか）、各READMEの「対応済み/未対応」記述を突き合わせ、ズレていれば実態に合わせて修正する。
+3. `infra/`配下のTerraformリソース構成を洗い出す（`docs/infrastructure.md`が存在する場合、構成図・ディレクトリ構成の説明と実際のリソース定義が一致しているか）。
+4. 上記1〜3と、`docs/requirements/data-model.md`（ER図と実装の差分）、`docs/requirements/roadmap.md`（実装済み機能が「候補」のまま残っていないか）、各READMEの「対応済み/未対応」記述を突き合わせ、ズレていれば実態に合わせて修正する。
 
 ## 参考
 
