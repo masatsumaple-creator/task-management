@@ -8,6 +8,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - db-data:/var/lib/postgresql/data
+    # ループバック(127.0.0.1)のみにバインド。EC2ホスト自身からの接続(psql等)は可能だが、
+    # セキュリティグループでも5432番は開けていないため外部からは一切到達できない。
+    ports:
+      - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U taskboard -d taskboard"]
       interval: 5s
